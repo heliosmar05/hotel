@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Clientes</title>
+
+
+    <link rel="stylesheet" href="../static/css/style.css">
+
+</head>
+
+<body>
+
+    <nav>
+        <div>
+            <a href="/"> Hotel Caribe Azul</a>
+            
+            <button type="button">
+                <span></span>
+            </button>
+            
+            <div id="navbarNav">
+                <ul>
+                    <li>
+                        <a href="/"> Cadastro</a>
+                    </li>
+                    <li>
+            
+                        <a href="/consulta"> Consultar</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <form id="formCadastro">
+        <div>
+            <div>
+                <label> Nome:</label>
+                <input type="text" name="nome" required>
+            </div>
+        </div>
+        <div>
+            <div>
+                <label> CPF:</label>
+                <input type="text" name="cpf" required>
+            </div>
+        </div>
+
+        <div>
+            <div>
+                <label> Email:</label>
+                <input type="email" name="email" required>
+            </div>
+        </div>
+        <div>
+            <div>
+                <label> Telefone:</label>
+                <input type="text" name="telefone" required>
+            </div>
+        </div>
+
+        <div>
+            <div>
+                <label> Endereço:</label>
+                <input type="text" name="endereco" required>
+            </div>
+        </div>
+
+        <div>
+            <div>
+                <label> Observação:</label>
+                <textarea type="text" name="observacao" required> </textarea>
+            </div>
+        </div>
+        <button type="submit">Cadastrar</button>
+    </form>
+
+    <div id="mensagem"></div>
+
+
+    <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>
