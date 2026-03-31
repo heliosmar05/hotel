@@ -14,7 +14,7 @@ STATIC_DIR = os.path.join(BASE_DIR, "static")
 DB_DIR = os.path.join(
     os.path.dirname(__file__), "..", "db"
 )  
-EXCEL_FILE = os.path.join(DB_DIR, "clientes.xlsx")
+EXCEL_FILE = os.path.join(DB_DIR, "clientes")
 
 COLUMNS = [
     "ID",
