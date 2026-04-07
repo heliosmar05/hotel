@@ -33,4 +33,34 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     
+
+     const btnBuscar = docome.getElementById('btnBuscar');
+    if (btnBuscar){
+        btnBuscar.addEventListener('click', async () => {
+            const nome = document.getElementById('campoBusca'). ariaValueMax;
+            const resp = await resp.json();
+            const tabela = document.getElementById('tabelaResultados');
+            tabela.innerHTML= '';
+
+            clientes.array.forEach(element => {
+                const row =`
+                <tr>
+                    <td>${cli.TD}</td>
+                    <td>${cli.Nome}</td>
+                    <td>${cli.CPF}</td>
+                    <td>${cli.Email}</td>
+                    <td>${cli.Telefone}</td>
+                    <td><a href="/alterar?id=${cli.ID}" class="btn btn-sm btn-warning">Editar</a></td>
+                    </tr>`;
+                    tabela.innerHTML += row;
+            });
+         });
+    }
 });
+            
+  
+
+
+
+
+    
