@@ -14,7 +14,7 @@ STATIC_DIR = os.path.join(BASE_DIR, "static")
 DB_DIR = os.path.join(
     os.path.dirname(__file__), "..", "db"
 )  
-EXCEL_FILE = os.path.join(DB_DIR, "clientes")
+EXCEL_FILE = os.path.join(DB_DIR, "clientes.xlsx")
 
 COLUMNS = [
     "ID",
@@ -34,14 +34,13 @@ def init_excel():
 
     if not os.path.exists(EXCEL_FILE):
         workbook = openpyxl.Workbook()  
-        sheet = workbook.active  
-        sheet.title = "Clientes"  
-        sheet.append(COLUMNS)  
-        workbook.save(EXCEL_FILE)  
+        sheet = workbook.active 
+        sheet.title = "Clientes" 
+        sheet.append(COLUMNS) 
+        workbook.save(EXCEL_FILE) 
 
 
-app = Flask(__name__, static_folder=STATIC_DIR, static_url_path="/" + STATIC_DIR)
-
+app = Flask(__name__, static_folder=STATIC_DIR, static_url_path="/static")
 
 
 @app.route("/")
@@ -64,11 +63,12 @@ def assets(filename):
     return send_from_directory("../frontend/assets", filename)
 
 
-@app.route("/cadastrar", methods=["POST"])
+@app.route("/api/cadastrar", methods=["POST"])
 def cadastrar_cliente():
     """Recebe os dados do formulário (em JSON), valida e salva um novo cliente no Excel."""
     try:
-        data = request.json  
+        data = request.json 
+        
         required_fields = ["nome", "cpf", "email", "telefone", "endereco"]
         if not all(field in data and data[field] for field in required_fields):
             return (
@@ -80,15 +80,15 @@ def cadastrar_cliente():
                 ),
                 400,
             )
-        workbook = openpyxl.load_workbook(EXCEL_FILE)  
+        workbook = openpyxl.load_workbook(EXCEL_FILE) 
         sheet = workbook.active
-    
+       
         last_id = 0
         if sheet.max_row > 1:
             last_id = sheet.cell(row=sheet.max_row, column=1).value or 0
         new_id = last_id + 1
 
-       
+        
         novo_cliente = [
             new_id,
             data.get("nome"),
@@ -96,11 +96,11 @@ def cadastrar_cliente():
             data.get("email"),
             data.get("telefone"),
             data.get("endereco"),
-            data.get("observacoes", ""), 
-            datetime.now().strftime("%Y-%m-%d"),
+            data.get("observacao", ""),  
+            datetime.now().strftime("%Y-%m-%d"),  
         ]
         sheet.append(novo_cliente)  
-        workbook.save(EXCEL_FILE)  
+        workbook.save(EXCEL_FILE) 
         return (
             jsonify(
                 {
@@ -116,34 +116,113 @@ def cadastrar_cliente():
             jsonify({"status": "error", "message": f"Erro ao salvar no servidor: {e}"}),
             500,
         )
-@app.route("/buscar", methods=["GET"])
+
+
+@app.route("/api/buscar", methods=["GET"])
 def buscar_clientes():
     """
     Busca clientes pelo nome (não diferencia maiúsculas/minúsculas).
     """
-    nome_quer = request.args.get("nome", "").lower()
+    nome_query = request.args.get("nome", "").lower() 
 
     try:
-        workbook = openpyxl,load_workbook(EXCEL_FILE)
+        workbook = openpyxl.load_workbook(EXCEL_FILE)
         sheet = workbook.active
-        resultados = []
-
-        for row in sheet.inter_rows(min_row=2, values_only=True):
-            cliente = dict(zip(COLUMNS, row))
+        resultados = [] 
+        for row in sheet.iter_rows(min_row=2, values_only=True):
+            cliente = dict(zip(COLUMNS, row))  
             nome_cliente = (cliente.get("Nome") or "").lower()
-            
-            if nome_quer in nome_cliente:
+
+            if nome_query in nome_cliente:
                 resultados.append(cliente)
 
-        return jsonify(resultados)
+        return jsonify(resultados)  
     except FileNotFoundError:
-        return(
-            jsonify({"status": "erro", "message":"Arquivo de dados não encoontrado."}),
+        return (
+            jsonify({"status": "error", "message": "Arquivo de dados não encontrado."}),
             404,
         )
     except Exception as e:
-        return(
-            jsonify({"status": "error", "message": f"Erro ao ler os dados:{e}"}),
+        return (
+            jsonify({"status": "error", "message": f"Erro ao ler os dados: {e}"}),
+            500,
+        )
+
+
+@app.route("/api/cliente/<int:cliente_id>", methods=["GET"])
+def get_cliente(cliente_id):
+    """
+    Retorna os dados completos de um cliente pelo seu ID.
+    """
+    try:
+        workbook = openpyxl.load_workbook(EXCEL_FILE)
+        sheet = workbook.active
+
+    
+        for row_idx in range(2, sheet.max_row + 1):
+            row_id = sheet.cell(row=row_idx, column=1).value
+            if row_id == cliente_id:
+                row_values = [cell.value for cell in sheet[row_idx]]
+                cliente = dict(zip(COLUMNS, row_values))
+                return jsonify(cliente)
+
+        return jsonify({"status": "error", "message": "Cliente não encontrado."}), 404
+    except Exception as e:
+        return (
+            jsonify({"status": "error", "message": f"Erro ao buscar cliente: {e}"}),
+            500,
+        )
+
+
+@app.route("/api/atualizar/<int:cliente_id>", methods=["POST"])
+def atualizar_cliente(cliente_id):
+    """
+    Função para alterar as informações de um hóspede no nosso banco de dados (Excel).
+    """
+    try:
+        
+        data = request.json
+
+        workbook = openpyxl.load_workbook(EXCEL_FILE)
+
+        sheet = workbook.active
+
+        row_to_update = -1
+
+        for row_idx in range(2, sheet.max_row + 1):
+            
+            if sheet.cell(row=row_idx, column=1).value == cliente_id:
+                row_to_update = row_idx  
+                break 
+        if row_to_update == -1:
+            return (
+                jsonify(
+                    {
+                        "status": "error",
+                        "message": "Cliente não encontrado para atualização.",
+                    }
+                ),
+                404, 
+            )
+        sheet.cell(row=row_to_update, column=2, value=data.get("nome"))
+        sheet.cell(row=row_to_update, column=3, value=data.get("cpf"))
+        sheet.cell(row=row_to_update, column=4, value=data.get("email"))
+        sheet.cell(row=row_to_update, column=5, value=data.get("telefone"))
+        sheet.cell(row=row_to_update, column=6, value=data.get("endereco"))
+        sheet.cell(row=row_to_update, column=7, value=data.get("observacao"))
+
+        workbook.save(EXCEL_FILE)
+
+        return jsonify(
+            {
+                "status": "success",
+                "message": "Dados do cliente atualizados com sucesso!",
+            }
+        )
+
+    except Exception as e:
+        return (
+            jsonify({"status": "error", "message": f"Erro ao atualizar dados: {e}"}),
             500,
         )
 
@@ -153,4 +232,6 @@ if __name__ == "__main__":
     print("FRONTEND_DIR:", FRONTEND_DIR)
     print("STATIC_DIR:", STATIC_DIR)
     init_excel()
-    app.run(debug=True)
+    app.run(
+        debug=True, port=5000
+    )

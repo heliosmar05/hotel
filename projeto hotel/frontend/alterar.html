@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alterar Dados do Cliente14/04</title>
+
+</head>
+
+<body>
+
+
+    <nav>
+        <div>
+            <a href="/">🏨 Hotel Caribe Azul</a>
+
+            <button type="button">
+                <span></span>
+            </button>
+
+            <div>
+                <ul>
+                    <li>
+                        <a href="/">🏠 Cadastro</a>
+                    </li>
+                    <li>
+                        <a href="/consulta">🔍 Consultar</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+   
+    <div>
+        <h2>✏️ Alterar Dados do Cliente</h2>
+
+        <form id="formAlterar">
+
+            <input type="hidden" id="clienteId">
+
+            <div>
+                <div>
+                    <label>Nome:</label>
+                    <input type="text" id="nome" required>
+                </div>
+
+                <div>
+                    <label>CPF:</label>
+                    <input type="text" id="cpf" required>
+                </div>
+
+                <div>
+                    <label>Email:</label>
+                    <input type="email" id="email" required>
+                </div>
+
+                
+                <div>
+                    <label>Telefone:</label>
+                    <input type="text" id="telefone" required>
+                </div>
+
+                <div>
+                    <label>Endereço:</label>
+                    <input type="text" id="endereco" required>
+                </div>
+
+                <div>
+                    <label>Observações:</label>
+                    <textarea id="observacoes"></textarea>
+                </div>
+            </div>
+
+            <div>
+                <button type="submit">💾 Salvar Alterações</button>
+            </div>
+        </form>
+
+        <div id="mensagem"></div>
+    </div>
+    <script src="assets/js/main.js"></script>
+
+    <footer class="text-center mt-5 p-3 text-white bg-dark">
+        <p> sistema de Alterar | Desenvolvido para fins didáticos</p>
+</body>
+
+</html>
